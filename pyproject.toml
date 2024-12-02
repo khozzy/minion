@@ -1,0 +1,24 @@
+[project]
+name = "minion"
+version = "0.1.0"
+description = "Personal LLM assistant service"
+authors = [
+    {name = "Norbert Kozlowski", email = "nkozlowski@protonmail.com"},
+]
+dependencies = ["flask>=3.1.0", "python-dotenv>=1.0.1", "gunicorn>=23.0.0"]
+requires-python = "==3.13.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+[dependency-groups]
+lint = [
+    "ruff"
+]
+
+[tool.pdm]
+distribution = true
+
+[tool.pdm.scripts]
+dev = "flask --app src/minion/app.py --debug run --host=0.0.0.0 --port=8082"
+docker_build = "docker build -t minion ."
+docker_run = "docker run --rm -p 8000:8000 -e API_KEY=123456 minion"
