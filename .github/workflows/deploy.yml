@@ -18,12 +18,13 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
           SSH_USER: ${{ secrets.SSH_USER }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
           chmod 600 ~/.ssh/deploy_key
-          echo -e "Host vps\n\tHostName $SSH_HOST\n\tUser $SSH_USER\n\tIdentityFile ~/.ssh/deploy_key\n\tStrictHostKeyChecking no\n\t" > ~/.ssh/config
+          echo -e "Host vps\n\tHostName $SSH_HOST\n\tUser $SSH_USER\n\tPort $SSH_PORT\n\tIdentityFile ~/.ssh/deploy_key\n\tStrictHostKeyChecking no\n\t" > ~/.ssh/config
 
       - name: Deploy to VPS
         env:
