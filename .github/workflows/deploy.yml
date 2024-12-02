@@ -20,6 +20,7 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
           SSH_USER: ${{ secrets.SSH_USER }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
@@ -32,9 +33,10 @@ jobs:
         run: |
           ssh vps '\
             docker pull ${{ env.DOCKER_IMAGE }}:${{ github.event.inputs.image_tag }} && \
-            docker stop minion || true && \
-            docker rm minion || true && \
+            docker stop minion 2>/dev/null && \
+            docker rm minion 2>/dev/null && \
             docker run -d \
               --name minion \
               --restart unless-stopped \
+              -e API_KEY=${{ env.API_KEY }} \
               ${{ env.DOCKER_IMAGE }}:${{ github.event.inputs.image_tag }}'
