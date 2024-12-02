@@ -20,7 +20,6 @@ jobs:
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
           SSH_USER: ${{ secrets.SSH_USER }}
-          API_KEY: ${{ secrets.API_KEY }}
         run: |
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
@@ -39,5 +38,5 @@ jobs:
               --name minion \
               --restart unless-stopped \
               -p 80:8000 \
-              -e API_KEY=${{ env.API_KEY }} \
+              -e API_KEY=${{ secrets.API_KEY }} \
               ${{ env.DOCKER_IMAGE }}:${{ github.event.inputs.image_tag }}'
