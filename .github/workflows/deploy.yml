@@ -1,0 +1,39 @@
+name: Deploy to VPS
+
+on:
+  workflow_dispatch:
+    inputs:
+      image_tag:
+        description: "Docker image tag"
+        required: true
+        default: "latest"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure SSH
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo -e "Host vps\n\tHostName $SSH_HOST\n\tUser $SSH_USER\n\tIdentityFile ~/.ssh/deploy_key\n\tStrictHostKeyChecking no\n\t" > ~/.ssh/config
+
+      - name: Deploy to VPS
+        env:
+          DOCKER_IMAGE: ghcr.io/khozzy/minion
+        run: |
+          ssh vps '\
+            docker pull ${{ env.DOCKER_IMAGE }}:${{ github.event.inputs.image_tag }} && \
+            docker stop minion || true && \
+            docker rm minion || true && \
+            docker run -d \
+              --name minion \
+              --restart unless-stopped \
+              ${{ env.DOCKER_IMAGE }}:${{ github.event.inputs.image_tag }}'
